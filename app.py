@@ -26,5 +26,20 @@ def index():
     apl = db.session.execute(db.select(Application)).scalars().all()
     return render_template("index.html", applications=apl)
 
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    if request.method == "POST":
+        company = request.form["company"]
+        position = request.form["position"]
+        status = request.form["status"]
+        url = request.form.get("url")
+        notes = request.form.get("notes")
+
+        new_application = Application(company=company, position=position, status=status, date_applied=date.today(), url=url, notes=notes)
+        db.session.add(new_application)
+        db.session.commit()
+        return redirect("/")
+    return render_template("add.html")
+
 if __name__ == '__main__':
-    app.run()
+   app.run()

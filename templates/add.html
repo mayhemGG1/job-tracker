@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Нова заявка</h2>
+
+<form method="post">
+    <p>
+        <label>Компанія<br>
+        <input type="text" name="company" maxlength="100" required></label>
+    </p>
+    <p>
+        <label>Посада<br>
+        <input type="text" name="position" maxlength="100" required></label>
+    </p>
+    <p>
+        <label>Статус<br>
+        <select name="status">
+            <option value="applied">applied</option>
+            <option value="interview">interview</option>
+            <option value="offer">offer</option>
+            <option value="rejected">rejected</option>
+        </select></label>
+    </p>
+    <p>
+        <label>Посилання на вакансію<br>
+        <input type="url" name="url" maxlength="300"></label>
+    </p>
+    <p>
+        <label>Нотатки<br>
+        <textarea name="notes" rows="4" cols="40"></textarea></label>
+    </p>
+    <button type="submit">Додати</button>
+    <a href="{{ url_for('index') }}">Назад</a>
+</form>
+{% endblock %}
