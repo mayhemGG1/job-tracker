@@ -22,8 +22,9 @@ with app.app_context():
     db.create_all()
 
 @app.route('/')
-def hello_world():
-    return "Hello World"
+def index():
+    apl = db.session.execute(db.select(Application)).scalars().all()
+    return render_template("index.html", applications=apl)
 
 if __name__ == '__main__':
     app.run()

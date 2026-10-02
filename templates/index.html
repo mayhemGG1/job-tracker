@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Компанія</th>
+        <th>Посада</th>
+        <th>Статус</th>
+        <th>Дата</th>
+    </tr>
+    {% for application in applications %}
+    <tr>
+        <td>{{ application.company }}</td>
+        <td>{{ application.position }}</td>
+        <td>{{ application.status }}</td>
+        <td>{{ application.date_applied }}</td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="4">Поки що порожньо</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
