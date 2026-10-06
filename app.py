@@ -41,5 +41,12 @@ def add():
         return redirect("/")
     return render_template("add.html")
 
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete(id):
+    application = db.get_or_404(Application, id)
+    db.session.delete(application)
+    db.session.commit()
+    return redirect("/")
+
 if __name__ == '__main__':
    app.run()

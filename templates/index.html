@@ -8,6 +8,7 @@
         <th>Посада</th>
         <th>Статус</th>
         <th>Дата</th>
+        <th></th>
     </tr>
     {% for application in applications %}
     <tr>
@@ -15,10 +16,15 @@
         <td>{{ application.position }}</td>
         <td>{{ application.status }}</td>
         <td>{{ application.date_applied }}</td>
+        <td>
+            <form method="post" action="{{ url_for('delete', id=application.id) }}">
+                <button type="submit">Видалити</button>
+            </form>
+        </td>
     </tr>
     {% else %}
     <tr>
-        <td colspan="4">Поки що порожньо</td>
+        <td colspan="5">Поки що порожньо</td>
     </tr>
     {% endfor %}
 </table>
