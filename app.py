@@ -23,8 +23,13 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    apl = db.session.execute(db.select(Application)).scalars().all()
-    return render_template("index.html", applications=apl)
+    status = request.args.get("status")
+    query = db.select(Application)
+    if status:
+        query = query.where(Application.status == status)
+    
+    applications = db.session.execute(query).scalars().all()
+    return render_template("index.html", applications=applications, current_status=status)
 
 @app.route("/add", methods=["GET", "POST"])
 def add():

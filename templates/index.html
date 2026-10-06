@@ -2,6 +2,19 @@
 
 {% block content %}
 <p><a href="{{ url_for('add') }}">+ Додати заявку</a></p>
+
+<form method="get" action="{{ url_for('index') }}">
+    <label>Статус:
+        <select name="status" onchange="this.form.submit()">
+            <option value="">Усі</option>
+            {% for s in ["applied", "interview", "offer", "rejected"] %}
+            <option value="{{ s }}" {% if s == current_status %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <noscript><button type="submit">Фільтр</button></noscript>
+</form>
+
 <table border="1" cellpadding="6">
     <tr>
         <th>Компанія</th>
