@@ -8,23 +8,32 @@
         <th>Посада</th>
         <th>Статус</th>
         <th>Дата</th>
-        <th></th>
+        <th>Нотатки</th>
+        <th>Дії</th>
     </tr>
     {% for application in applications %}
     <tr>
         <td>{{ application.company }}</td>
-        <td>{{ application.position }}</td>
+        <td>
+            {% if application.url %}
+            <a href="{{ application.url }}" target="_blank" rel="noopener">{{ application.position }}</a>
+            {% else %}
+            {{ application.position }}
+            {% endif %}
+        </td>
         <td>{{ application.status }}</td>
         <td>{{ application.date_applied }}</td>
+        <td>{{ application.notes or "" }}</td>
         <td>
-            <form method="post" action="{{ url_for('delete', id=application.id) }}">
+            <a href="{{ url_for('edit', id=application.id) }}">Редагувати</a>
+            <form method="post" action="{{ url_for('delete', id=application.id) }}" style="display:inline">
                 <button type="submit">Видалити</button>
             </form>
         </td>
     </tr>
     {% else %}
     <tr>
-        <td colspan="5">Поки що порожньо</td>
+        <td colspan="6">Поки що порожньо</td>
     </tr>
     {% endfor %}
 </table>

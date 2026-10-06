@@ -48,5 +48,18 @@ def delete(id):
     db.session.commit()
     return redirect("/")
 
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+def edit(id):
+    application = db.get_or_404(Application, id)
+    if request.method == "POST":
+        application.company = request.form["company"]
+        application.position = request.form["position"]
+        application.status = request.form["status"]
+        application.url = request.form["url"]
+        application.notes = request.form["notes"]
+        db.session.commit()
+        return redirect("/")
+    return render_template("edit.html", application=application)
+
 if __name__ == '__main__':
    app.run()
