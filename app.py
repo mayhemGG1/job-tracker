@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL" , "sqlite:///jobs.db")
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "dev-only-change-me")
 
 db = SQLAlchemy(app)
 
@@ -18,6 +20,17 @@ class Application(db.Model):
     date_applied = db.Column(db.Date, default=date.today)
     url = db.Column(db.String(300))
     notes = db.Column(db.Text)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 with app.app_context():
     db.create_all()
@@ -66,6 +79,27 @@ def edit(id):
         db.session.commit()
         return redirect("/")
     return render_template("edit.html", application=application)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+
+        if len(password) < 8:
+            flash("Пароль має містити щонайменше 8 символів")
+            return redirect("/register")
+        
+        if db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none() is not None:
+            flash("Користувач з таким email уже є")
+            return redirect("/register")
+
+        u = User(email=email)
+        u.set_password(password)
+        db.session.add(u)
+        db.session.commit()
+        return redirect("/")
+    return render_template("register.html")
 
 if __name__ == '__main__':
    app.run()
