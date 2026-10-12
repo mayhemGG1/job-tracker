@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager, UserMixin, login_user
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -107,6 +107,22 @@ def register():
         db.session.commit()
         return redirect("/")
     return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+
+        user = db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none()
+
+        if user is not None and user.check_password(password):
+            login_user(user)
+            return redirect("/")
+        else:
+            flash("Невірний email або пароль")
+            return redirect("/login")
+    return render_template("login.html")
 
 if __name__ == '__main__':
    app.run()
