@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -123,6 +123,11 @@ def login():
             flash("Невірний email або пароль")
             return redirect("/login")
     return render_template("login.html")
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    logout_user()
+    return redirect("/login")
 
 if __name__ == '__main__':
    app.run()

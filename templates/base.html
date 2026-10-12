@@ -8,6 +8,20 @@
 <body>
     <h1>Job Tracker</h1>
 
+    {% if request.endpoint not in ['login', 'register'] %}
+<nav>
+    {% if current_user.is_authenticated %}
+        {{ current_user.email }}
+        <form method="post" action="{{ url_for('logout') }}" style="display:inline">
+            <button type="submit">Вийти</button>
+        </form>
+    {% else %}
+        <a href="{{ url_for('login') }}">Увійти</a> |
+        <a href="{{ url_for('register') }}">Реєстрація</a>
+    {% endif %}
+</nav>
+{% endif %}
+
     {% with messages = get_flashed_messages() %}
         {% for message in messages %}
         <p style="color: red;">{{ message }}</p>
