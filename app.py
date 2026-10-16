@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, abort
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -23,6 +23,7 @@ class Application(db.Model):
     date_applied = db.Column(db.Date, default=date.today)
     url = db.Column(db.String(300))
     notes = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,9 +44,10 @@ with app.app_context():
     db.create_all()
 
 @app.route('/')
+@login_required
 def index():
     status = request.args.get("status")
-    query = db.select(Application)
+    query = db.select(Application).where(Application.user_id == current_user.id)
     if status:
         query = query.where(Application.status == status)
     
@@ -53,6 +55,7 @@ def index():
     return render_template("index.html", applications=applications, current_status=status)
 
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def add():
     if request.method == "POST":
         company = request.form["company"]
@@ -61,22 +64,28 @@ def add():
         url = request.form.get("url")
         notes = request.form.get("notes")
 
-        new_application = Application(company=company, position=position, status=status, date_applied=date.today(), url=url, notes=notes)
+        new_application = Application(company=company, position=position, status=status, date_applied=date.today(), url=url, notes=notes, user_id=current_user.id)
         db.session.add(new_application)
         db.session.commit()
         return redirect("/")
     return render_template("add.html")
 
 @app.route("/delete/<int:id>", methods=["POST"])
+@login_required
 def delete(id):
     application = db.get_or_404(Application, id)
+    if application.user_id != current_user.id:
+        abort(404)
     db.session.delete(application)
     db.session.commit()
     return redirect("/")
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
+@login_required
 def edit(id):
     application = db.get_or_404(Application, id)
+    if application.user_id != current_user.id:
+        abort(404)
     if request.method == "POST":
         application.company = request.form["company"]
         application.position = request.form["position"]
